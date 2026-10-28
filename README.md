@@ -21,6 +21,16 @@ Students exploring the **Cheminformatics Virtual Laboratory** will master:
 | `.streamlit/config.toml` | Custom academic theme configuration (`#1E3A8A` primary navy, `#F8FAFC` slate background, `#FFFFFF` cards) |
 | `README.md` | Project documentation, local setup guide, and Streamlit Cloud deployment instructions |
 
+## Application Pages
+
+1. **Home**: Hero banner with "Start Learning" quick-action, interactive feature grid, reference table of 6 benchmark molecules, and academic footer.
+2. **Theory**: Expandable modules covering SMILES syntax, Molecular Graphs, Molecular Descriptors, and Lipinski's Rule of Five with live examples.
+3. **Molecular Visualization**: Dual-tab (`2D | 3D`) viewer with one-click example buttons, friendly SMILES error diagnostics, RDKit 2D drawings, and MMFF94-optimized 3D models (`stick`, `sphere`, `line` styles and customizable color schemes).
+4. **Molecular Properties Report**: Physicochemical descriptor calculation displayed as `st.metric` cards, Lipinski pass/fail badge, structured table, and downloadable **CSV** and **PDF** reports stamped with student metadata.
+5. **Structure-Property Analysis**: Batch multi-SMILES comparison table, customizable descriptor bar chart, and interactive **MW vs. LogP** chemical space scatter plot.
+6. **Assessment**: 10-question interactive multiple-choice quiz (one question at a time) with progress bar, instant feedback explanations, and final achievement badge.
+7. **Final Project Report**: Consolidated lab portfolio summarizing student registration info, all molecules studied during the session, descriptor summary table, assessment score, and one-click **PDF** portfolio export.
+
 ## Local Installation & Usage
 
 1. **Clone the repository**:
@@ -44,3 +54,10 @@ Students exploring the **Cheminformatics Virtual Laboratory** will master:
    ```bash
    streamlit run app.py
    ```
+
+## Deploying to Streamlit Community Cloud
+
+1. Push `app.py`, `requirements.txt`, `.streamlit/config.toml`, and `README.md` to a public or private GitHub repository.
+2. Sign in to [share.streamlit.io](https://share.streamlit.io) and click **New app**.
+3. Select your repository (`varunkolla31-create/cheminformatics-virtual-lab`), branch (`main`), and set **Main file path** to `app.py`.
+4. Under **Advanced settings**, select **Python 3.11** and click **Deploy!**.

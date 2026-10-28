@@ -182,13 +182,13 @@ def init_session_state() -> None:
         "reg_number": "",
         "dark_mode": False,
         "completed_pages": {"Home"},
-        "studied_molecules": {},
+        "studied_molecules": {},  # smiles -> properties dict
         "viz_smiles": "CC(=O)Oc1ccccc1C(=O)O",
         "prop_smiles": "CC(=O)Oc1ccccc1C(=O)O",
         "batch_smiles": "\n".join(EXAMPLE_MOLECULES.values()),
         "quiz_index": 0,
-        "quiz_answers": {},
-        "quiz_submitted": {},
+        "quiz_answers": {},  # q_idx -> selected_option
+        "quiz_submitted": {},  # q_idx -> bool
     }
     for key, val in defaults.items():
         if key not in st.session_state:
