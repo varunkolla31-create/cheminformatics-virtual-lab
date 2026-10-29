@@ -7,6 +7,7 @@ Python 3.11 | RDKit | py3Dmol | stmol | Plotly | ReportLab
 from __future__ import annotations
 
 import io
+import math
 from datetime import datetime
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -14,14 +15,31 @@ import pandas as pd
 import plotly.express as px
 import py3Dmol
 import streamlit as st
-from PIL import Image
+import streamlit.components.v1 as components
+from PIL import Image, ImageDraw, ImageFont
 from rdkit import Chem
-from rdkit.Chem import AllChem, Crippen, Descriptors, Draw, Lipinski, rdMolDescriptors
+from rdkit.Chem import AllChem, Crippen, Descriptors, Lipinski, rdMolDescriptors
+
+# Safe import for RDKit 2D Draw (requires libXrender1 on Linux containers)
+try:
+    from rdkit.Chem import Draw as RDKitDraw
+    HAS_RDKIT_DRAW = True
+except Exception:
+    RDKitDraw = None
+    HAS_RDKIT_DRAW = False
+
+# Safe import for stmol with native Streamlit HTML component fallback
+try:
+    from stmol import showmol as _stmol_showmol
+    HAS_STMOL = True
+except Exception:
+    _stmol_showmol = None
+    HAS_STMOL = False
+
 from reportlab.lib import colors
 from reportlab.lib.pagesizes import letter
 from reportlab.lib.styles import ParagraphStyle, getSampleStyleSheet
 from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer, Table, TableStyle
-from stmol import showmol
 from streamlit_option_menu import option_menu
 
 # -----------------------------------------------------------------------------
@@ -182,13 +200,13 @@ def init_session_state() -> None:
         "reg_number": "",
         "dark_mode": False,
         "completed_pages": {"Home"},
-        "studied_molecules": {},  # smiles -> properties dict
+        "studied_molecules": {},
         "viz_smiles": "CC(=O)Oc1ccccc1C(=O)O",
         "prop_smiles": "CC(=O)Oc1ccccc1C(=O)O",
         "batch_smiles": "\n".join(EXAMPLE_MOLECULES.values()),
         "quiz_index": 0,
-        "quiz_answers": {},  # q_idx -> selected_option
-        "quiz_submitted": {},  # q_idx -> bool
+        "quiz_answers": {},
+        "quiz_submitted": {},
     }
     for key, val in defaults.items():
         if key not in st.session_state:
@@ -322,17 +340,88 @@ def validate_smiles(smiles: str) -> Tuple[Optional[Chem.Mol], Optional[str]]:
         )
 
 
+def _draw_2d_fallback_pillow(mol: Chem.Mol, width: int = 450, height: int = 340) -> bytes:
+    """Pure Pillow 2D structure renderer using RDKit 2D coordinates (no libXrender needed)."""
+    AllChem.Compute2DCoords(mol)
+    conf = mol.GetConformer()
+    n_atoms = mol.GetNumAtoms()
+
+    img = Image.new("RGB", (width, height), "white")
+    draw = ImageDraw.Draw(img)
+
+    if n_atoms == 0:
+        buf = io.BytesIO()
+        img.save(buf, format="PNG")
+        return buf.getvalue()
+
+    coords = [(conf.GetAtomPosition(i).x, conf.GetAtomPosition(i).y) for i in range(n_atoms)]
+    xs = [c[0] for c in coords]
+    ys = [c[1] for c in coords]
+    min_x, max_x = min(xs), max(xs)
+    min_y, max_y = min(ys), max(ys)
+    span_x = max(max_x - min_x, 1.5)
+    span_y = max(max_y - min_y, 1.5)
+    scale = min((width - 100) / span_x, (height - 90) / span_y, 65.0)
+    cx = width / 2.0 - ((min_x + max_x) / 2.0) * scale
+    cy = height / 2.0 + ((min_y + max_y) / 2.0) * scale
+
+    def to_px(idx: int) -> Tuple[float, float]:
+        x, y = coords[idx]
+        return (cx + x * scale, cy - y * scale)
+
+    # Draw bonds
+    for bond in mol.GetBonds():
+        i = bond.GetBeginAtomIdx()
+        j = bond.GetEndAtomIdx()
+        p1 = to_px(i)
+        p2 = to_px(j)
+        dx = p2[0] - p1[0]
+        dy = p2[1] - p1[1]
+        dist = math.hypot(dx, dy) or 1.0
+        nx, ny = -dy / dist, dx / dist
+        btype = bond.GetBondTypeAsDouble()
+
+        if btype >= 2.0 or bond.GetIsAromatic():
+            offset = 3.5
+            draw.line([(p1[0] + nx * offset, p1[1] + ny * offset), (p2[0] + nx * offset, p2[1] + ny * offset)], fill="#1E293B", width=3)
+            draw.line([(p1[0] - nx * offset, p1[1] - ny * offset), (p2[0] - nx * offset, p2[1] - ny * offset)], fill="#1E293B", width=3)
+        else:
+            draw.line([p1, p2], fill="#1E293B", width=3)
+
+    # Draw heteroatom labels
+    atom_colors = {"O": "#DC2626", "N": "#2563EB", "S": "#D97706", "F": "#0D9488", "Cl": "#16A34A", "Br": "#9333EA"}
+    font = ImageFont.load_default()
+    for idx in range(n_atoms):
+        atom = mol.GetAtomWithIdx(idx)
+        sym = atom.GetSymbol()
+        if sym != "C" or n_atoms <= 2:
+            px_x, px_y = to_px(idx)
+            r = 12
+            draw.ellipse([px_x - r, px_y - r, px_x + r, px_y + r], fill="white")
+            col = atom_colors.get(sym, "#0F172A")
+            draw.text((px_x - 4 * len(sym), px_y - 6), sym, fill=col, font=font)
+
+    buf = io.BytesIO()
+    img.save(buf, format="PNG")
+    return buf.getvalue()
+
+
 @st.cache_data(show_spinner=False)
 def render_2d_image(smiles: str, width: int = 450, height: int = 340) -> Optional[bytes]:
-    """Generate a PNG byte buffer of the 2D molecular depiction."""
+    """Generate a PNG byte buffer of the 2D molecular depiction with X11-safe fallback."""
     mol = Chem.MolFromSmiles(smiles.strip())
     if mol is None:
         return None
     AllChem.Compute2DCoords(mol)
-    img: Image.Image = Draw.MolToImage(mol, size=(width, height))
-    buf = io.BytesIO()
-    img.save(buf, format="PNG")
-    return buf.getvalue()
+    if HAS_RDKIT_DRAW and RDKitDraw is not None:
+        try:
+            img: Image.Image = RDKitDraw.MolToImage(mol, size=(width, height))
+            buf = io.BytesIO()
+            img.save(buf, format="PNG")
+            return buf.getvalue()
+        except Exception:
+            pass
+    return _draw_2d_fallback_pillow(mol, width=width, height=height)
 
 
 @st.cache_data(show_spinner=False)
@@ -359,6 +448,17 @@ def build_3d_molblock(smiles: str) -> Tuple[Optional[str], Optional[str]]:
             f"3D conformer generation failed ({exc}). "
             "Suggested fix: Try a smaller organic molecule without disconnected salts."
         )
+
+
+def render_3d_viewer(view: Any, height: int = 450, width: int = 700) -> None:
+    """Render py3Dmol view using stmol or native Streamlit HTML component fallback."""
+    if HAS_STMOL and _stmol_showmol is not None:
+        try:
+            _stmol_showmol(view, height=height, width=width)
+            return
+        except Exception:
+            pass
+    components.html(view._make_html(), height=height + 20, width=width)
 
 
 @st.cache_data(show_spinner=False)
@@ -882,7 +982,7 @@ def render_visualization() -> None:
             view.setStyle({style_choice: {"colorscheme": scheme_arg}})
             view.setBackgroundColor("#0F172A" if st.session_state["dark_mode"] else "#FFFFFF")
             view.zoomTo()
-            showmol(view, height=450, width=700)
+            render_3d_viewer(view, height=450, width=700)
             st.caption("🖱️ **Controls:** Left-click + drag to rotate • Scroll to zoom • Right-click + drag to pan.")
 
 
