@@ -25,28 +25,51 @@ render_top_nav("Property Calculator")
 
 st.markdown('<div class="apple-section-title">Physicochemical Property Calculator</div>', unsafe_allow_html=True)
 st.markdown(
-    '<div class="apple-section-lead">Evaluate molecular descriptors, oral bioavailability thresholds, and Lipinski's Rule of Five.</div>',
+    '<div class="apple-section-lead">Evaluate molecular descriptors, oral bioavailability thresholds, and Lipinski\'s Rule of Five.</div>',
     unsafe_allow_html=True,
 )
 
+
+def _on_preset_change() -> None:
+    chosen = st.session_state.get("prop_preset_select", "Custom SMILES")
+    if chosen != "Custom SMILES" and chosen in EXAMPLE_MOLECULES:
+        st.session_state["prop_smiles"] = EXAMPLE_MOLECULES[chosen]
+        st.session_state["prop_smiles_input"] = EXAMPLE_MOLECULES[chosen]
+
+
+if "prop_smiles_input" not in st.session_state:
+    st.session_state["prop_smiles_input"] = st.session_state.get("prop_smiles", "CC(=O)Oc1ccccc1C(=O)O")
+
 col_in, col_pre = st.columns([2, 1])
 with col_pre:
-    preset = st.selectbox("Load Benchmark Molecule", ["Custom SMILES"] + list(EXAMPLE_MOLECULES.keys()))
-    if preset != "Custom SMILES":
-        st.session_state["prop_smiles"] = EXAMPLE_MOLECULES[preset]
+    preset = st.selectbox(
+        "Load Benchmark Molecule",
+        ["Custom SMILES"] + list(EXAMPLE_MOLECULES.keys()),
+        key="prop_preset_select",
+        on_change=_on_preset_change,
+    )
 
 with col_in:
-    smiles = st.text_input("Molecule SMILES", value=st.session_state["prop_smiles"])
+    smiles = st.text_input(
+        "Molecule SMILES",
+        key="prop_smiles_input",
+        placeholder="e.g., CC(=O)Oc1ccccc1C(=O)O",
+    )
     st.session_state["prop_smiles"] = smiles
 
 _, err = validate_smiles(smiles)
 if err:
-    st.error(f"⚠️ {err}")
+    st.error(f"Invalid SMILES: {err}")
     render_footer()
     st.stop()
 
 with st.spinner("Calculating physicochemical properties..."):
     props = calculate_molecular_properties(smiles)
+
+if not props:
+    st.error("Unable to calculate molecular properties for the provided SMILES string.")
+    render_footer()
+    st.stop()
 
 record_studied_molecule(props)
 
@@ -85,23 +108,61 @@ with col_radar:
         round(props["TPSA"] / 140.0, 2),
     ]
     fig = go.Figure()
-    fig.add_trace(go.Scatterpolar(r=[1, 1, 1, 1, 1], theta=categories, fill="toself", name="Ro5 Limit (1.0)", line_color="#D2D2D7"))
-    fig.add_trace(go.Scatterpolar(r=values, theta=categories, fill="toself", name=props["Name"], line_color="#0071E3"))
+    fig.add_trace(
+        go.Scatterpolar(
+            r=[1, 1, 1, 1, 1],
+            theta=categories,
+            fill="toself",
+            name="Ro5 Limit (1.0)",
+            line_color="#D2D2D7",
+        )
+    )
+    fig.add_trace(
+        go.Scatterpolar(
+            r=values,
+            theta=categories,
+            fill="toself",
+            name=props["Name"],
+            line_color="#0071E3",
+        )
+    )
     fig.update_layout(
         polar=dict(radialaxis=dict(visible=True, range=[0, max(1.5, max(values) + 0.2)])),
         margin=dict(l=30, r=30, t=30, b=30),
         height=340,
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
     )
     st.plotly_chart(fig, use_container_width=True)
 
 with col_table:
     st.markdown("#### Rule-of-Five Criterion Breakdown")
     ro5_df = pd.DataFrame([
-        {"Rule": "Molecular Weight <= 500 Da", "Value": f"{props['Molecular Weight']} Da", "Status": "✅ Pass" if props["Molecular Weight"] <= 500 else "❌ Violation"},
-        {"Rule": "LogP <= 5.0", "Value": f"{props['LogP']}", "Status": "✅ Pass" if props["LogP"] <= 5.0 else "❌ Violation"},
-        {"Rule": "H-Bond Donors <= 5", "Value": str(props["H-bond Donors"]), "Status": "✅ Pass" if props["H-bond Donors"] <= 5 else "❌ Violation"},
-        {"Rule": "H-Bond Acceptors <= 10", "Value": str(props["H-bond Acceptors"]), "Status": "✅ Pass" if props["H-bond Acceptors"] <= 10 else "❌ Violation"},
-        {"Rule": "Veber TPSA <= 140 Å²", "Value": f"{props['TPSA']} Å²", "Status": "✅ Pass" if props["TPSA"] <= 140 else "⚠️ High Polar Area"},
+        {
+            "Rule": "Molecular Weight <= 500 Da",
+            "Value": f"{props['Molecular Weight']} Da",
+            "Status": "Pass" if props["Molecular Weight"] <= 500 else "Violation",
+        },
+        {
+            "Rule": "LogP <= 5.0",
+            "Value": f"{props['LogP']}",
+            "Status": "Pass" if props["LogP"] <= 5.0 else "Violation",
+        },
+        {
+            "Rule": "H-Bond Donors <= 5",
+            "Value": str(props["H-bond Donors"]),
+            "Status": "Pass" if props["H-bond Donors"] <= 5 else "Violation",
+        },
+        {
+            "Rule": "H-Bond Acceptors <= 10",
+            "Value": str(props["H-bond Acceptors"]),
+            "Status": "Pass" if props["H-bond Acceptors"] <= 10 else "Violation",
+        },
+        {
+            "Rule": "Veber TPSA <= 140 Å²",
+            "Value": f"{props['TPSA']} Å²",
+            "Status": "Pass" if props["TPSA"] <= 140 else "High Polar Area",
+        },
     ])
     st.dataframe(ro5_df, use_container_width=True, hide_index=True)
 
