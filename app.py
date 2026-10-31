@@ -227,7 +227,7 @@ with fac_col:
                 Dr. P Pachamuthu
             </p>
             <p style="margin-bottom:0.6rem;">
-                Assistant Professor<br/>
+                Professor<br/>
                 Division of Chemistry, School of Sciences<br/>
                 Faculty of Engineering and Technology<br/>
                 SRM Institute of Science and Technology, Tiruchirappalli

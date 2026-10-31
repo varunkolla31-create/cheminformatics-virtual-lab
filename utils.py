@@ -989,7 +989,7 @@ def generate_pdf_report(
     story.append(Paragraph("Faculty Attribution & Course Coordinator", subtitle_style))
     story.append(
         Paragraph(
-            "<b>Dr. P Pachamuthu</b> — Assistant Professor, Division of Chemistry, School of Sciences, "
+            "<b>Dr. P Pachamuthu</b> — Professor, Division of Chemistry, School of Sciences, "
             "Faculty of Engineering and Technology, SRM Institute of Science and Technology, Tiruchirappalli "
             "(Contact: pachamuthup@srmist.edu.in)",
             faculty_style,
