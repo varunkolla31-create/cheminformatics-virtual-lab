@@ -1,5 +1,5 @@
 """
-Home Page — Cheminformatics Virtual Laboratory (Apple UI/UX Edition)
+Home Page — Cheminformatics Virtual Laboratory
 Modelled on SRM Institute of Science and Technology Cheminformatics Virtual Laboratory
 Created by Varun K | RA2611026050122 | Section: AIML B
 """
@@ -245,7 +245,7 @@ with stu_col:
     st.markdown(
         """
         <div class="apple-card">
-            <div class="apple-card-tag">APPLE UI/UX MULTIPAGE IMPLEMENTATION</div>
+            <div class="apple-card-tag">STUDENT IN SRMIST</div>
             <h3>🎓 Student Developer Profile</h3>
             <p style="color:#1D1D1F; font-weight:600; font-size:1.02rem; margin-bottom:0.25rem;">
                 Varun K
