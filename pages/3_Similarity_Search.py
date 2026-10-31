@@ -21,7 +21,7 @@ init_session_state()
 inject_apple_css()
 render_top_nav("Similarity Search")
 
-st.markdown('<div class="apple-section-title">🧬 Molecular Fingerprint & Tanimoto Similarity Search</div>', unsafe_allow_html=True)
+st.markdown('<div class="apple-section-title">Molecular Fingerprint & Tanimoto Similarity</div>', unsafe_allow_html=True)
 st.markdown(
     '<div class="apple-section-lead">Screen a curated reference library against your query compound using 2D molecular fingerprints.</div>',
     unsafe_allow_html=True,
@@ -82,7 +82,7 @@ with right_table:
     st.markdown(f"#### Screening Hits ({len(df_filtered)} compounds >= {min_sim:.2f})")
     st.dataframe(df_filtered, use_container_width=True, hide_index=True, height=360)
     st.download_button(
-        "📥 Download Similarity Ranking (CSV)",
+        "Export Similarity Ranking (CSV)",
         data=df_filtered.to_csv(index=False).encode("utf-8"),
         file_name="tanimoto_similarity_results.csv",
         mime="text/csv",

@@ -23,7 +23,7 @@ init_session_state()
 inject_apple_css()
 render_top_nav("Property Calculator")
 
-st.markdown('<div class="apple-section-title">📊 Physicochemical Property Calculator</div>', unsafe_allow_html=True)
+st.markdown('<div class="apple-section-title">Physicochemical Property Calculator</div>', unsafe_allow_html=True)
 st.markdown(
     '<div class="apple-section-lead">Evaluate molecular descriptors, oral bioavailability thresholds, and Lipinski's Rule of Five.</div>',
     unsafe_allow_html=True,
@@ -109,7 +109,7 @@ with col_table:
     dl1, dl2 = st.columns(2)
     with dl1:
         st.download_button(
-            "📥 Export CSV",
+            "Export CSV",
             data=df_out.to_csv(index=False).encode("utf-8"),
             file_name=f"properties_{props['Name']}.csv",
             mime="text/csv",
@@ -123,7 +123,7 @@ with col_table:
             properties_list=[props],
         )
         st.download_button(
-            "📄 Export PDF Report",
+            "Export PDF Report",
             data=pdf_bytes,
             file_name=f"properties_{props['Name']}.pdf",
             mime="application/pdf",

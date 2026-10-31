@@ -24,7 +24,7 @@ init_session_state()
 inject_apple_css()
 render_top_nav("Molecule Viewer")
 
-st.markdown('<div class="apple-section-title">🔬 Molecule Viewer (2D & 3D)</div>', unsafe_allow_html=True)
+st.markdown('<div class="apple-section-title">Molecule Viewer (2D & 3D)</div>', unsafe_allow_html=True)
 st.markdown(
     '<div class="apple-section-lead">Inspect publication-grade 2D skeletal structures and MMFF94 force-field minimised 3D conformers.</div>',
     unsafe_allow_html=True,
@@ -94,7 +94,7 @@ if view_mode == "Side-by-Side (2D & 3D)":
         if img_bytes:
             st.image(img_bytes, use_container_width=True)
             st.download_button(
-                "📥 Download 2D PNG",
+                "Download 2D PNG",
                 data=img_bytes,
                 file_name=f"{props['Name']}_2D.png",
                 mime="image/png",
@@ -111,7 +111,7 @@ if view_mode == "Side-by-Side (2D & 3D)":
             view.zoomTo()
             render_3d_viewer(view, height=400, width=540)
             st.download_button(
-                "📥 Download 3D SDF / MolBlock",
+                "Download 3D SDF",
                 data=molblock.encode("utf-8"),
                 file_name=f"{props['Name']}_3D.sdf",
                 mime="chemical/x-mdl-sdfile",

@@ -222,26 +222,34 @@ def init_session_state() -> None:
 
 
 def inject_apple_css() -> None:
-    """Inject Apple.com minimalism CSS matching Mobbin reference specifications."""
+    """Inject clean, modern product UI CSS (Apple / Linear / Stripe aesthetic)."""
     st.markdown(
         """
         <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
         :root {
-            --apple-bg: #FBFBFD;
-            --apple-surface: #FFFFFF;
-            --apple-text-primary: #1D1D1F;
-            --apple-text-secondary: #6E6E73;
-            --apple-accent: #0071E3;
-            --apple-accent-hover: #0077ED;
-            --apple-border: #D2D2D7;
+            --bg: #FBFBFD;
+            --surface: #FFFFFF;
+            --text-primary: #1D1D1F;
+            --text-secondary: #6E6E73;
+            --accent: #0071E3;
+            --border: rgba(0, 0, 0, 0.08);
+        }
+
+        html {
+            scroll-behavior: smooth;
         }
 
         html, body, [class*="css"] {
-            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Display", "SF Pro Text", "Inter", sans-serif !important;
+            font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", sans-serif !important;
             color: #1D1D1F;
             -webkit-font-smoothing: antialiased;
+        }
+
+        code, pre {
+            font-family: "JetBrains Mono", "SF Mono", monospace !important;
+            font-size: 0.84rem !important;
         }
 
         .stApp {
@@ -250,135 +258,152 @@ def inject_apple_css() -> None:
         }
 
         .block-container {
-            padding-top: 1.5rem !important;
+            padding-top: 1.25rem !important;
             padding-bottom: 3rem !important;
-            max-width: 1220px !important;
+            max-width: 1180px !important;
         }
 
-        /* Sticky Translucent Top Navigation Bar (Apple Glassmorphism) */
+        @keyframes revealUp {
+            from {
+                opacity: 0;
+                transform: translateY(14px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Sticky Glassmorphic Header */
         .apple-top-nav {
             position: sticky;
             top: 0;
             z-index: 999;
-            background: rgba(251, 251, 253, 0.82);
+            background: rgba(251, 251, 253, 0.85);
             backdrop-filter: saturate(180%) blur(20px);
             -webkit-backdrop-filter: saturate(180%) blur(20px);
-            border: 1px solid rgba(210, 210, 215, 0.75);
-            border-radius: 16px;
-            padding: 0.7rem 1.35rem;
-            margin-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+            padding: 0.75rem 0.25rem;
+            margin-bottom: 1.75rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 0.75rem;
-            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
         }
 
         .apple-brand {
             display: flex;
             align-items: center;
-            gap: 0.55rem;
-            font-weight: 700;
-            font-size: 1.02rem;
-            letter-spacing: -0.02em;
+            gap: 0.65rem;
+            font-weight: 600;
+            font-size: 0.98rem;
+            letter-spacing: -0.015em;
             color: #1D1D1F;
+        }
+
+        .apple-brand-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #0071E3;
+            display: inline-block;
         }
 
         .apple-nav-pills {
             display: flex;
             align-items: center;
-            gap: 0.4rem;
-            flex-wrap: wrap;
+            gap: 0.25rem;
+            background: rgba(0, 0, 0, 0.04);
+            padding: 0.22rem;
+            border-radius: 980px;
         }
 
         .apple-nav-pill {
-            font-size: 0.82rem;
+            font-size: 0.78rem;
             font-weight: 500;
-            padding: 0.32rem 0.8rem;
+            padding: 0.28rem 0.78rem;
             border-radius: 980px;
             color: #6E6E73;
-            background: transparent;
-            border: 1px solid transparent;
             transition: all 0.2s ease;
         }
 
         .apple-nav-pill.active {
-            background: #1D1D1F;
-            color: #FFFFFF;
+            background: #FFFFFF;
+            color: #1D1D1F;
             font-weight: 600;
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
         }
 
-        /* Apple Hero Section */
+        /* Hero Section */
         .apple-hero {
-            background: linear-gradient(180deg, #FFFFFF 0%, #F5F5F7 100%);
-            border: 1px solid #D2D2D7;
+            background: #FFFFFF;
+            border: 1px solid rgba(0, 0, 0, 0.07);
             border-radius: 20px;
-            padding: 3.2rem 2.5rem;
-            text-align: center;
-            margin-bottom: 2rem;
-            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.04);
+            padding: 2.75rem 2.5rem;
+            margin-bottom: 1.75rem;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
+            animation: revealUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
         .apple-eyebrow {
-            font-size: 0.82rem;
+            font-size: 0.76rem;
             font-weight: 600;
             text-transform: uppercase;
-            letter-spacing: 0.08em;
+            letter-spacing: 0.06em;
             color: #0071E3;
-            margin-bottom: 0.65rem;
+            margin-bottom: 0.45rem;
         }
 
         .apple-hero-title {
-            font-size: 2.85rem;
+            font-size: 2.45rem;
             font-weight: 700;
-            letter-spacing: -0.035em;
-            line-height: 1.1;
+            letter-spacing: -0.03em;
+            line-height: 1.12;
             color: #1D1D1F;
-            margin: 0 auto 0.9rem auto;
-            max-width: 820px;
+            margin: 0 0 0.65rem 0;
         }
 
         .apple-hero-subtitle {
-            font-size: 1.15rem;
+            font-size: 1.05rem;
             font-weight: 400;
             line-height: 1.55;
             color: #6E6E73;
             max-width: 680px;
-            margin: 0 auto 1.25rem auto;
+            margin: 0;
         }
 
-        /* Apple Minimalist Surface Cards */
+        /* Surface Cards */
         .apple-card {
             background-color: #FFFFFF;
-            border: 1px solid #D2D2D7;
-            border-radius: 18px;
-            padding: 1.6rem;
-            box-shadow: 0 4px 18px rgba(0, 0, 0, 0.03);
-            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.25s ease;
+            border: 1px solid rgba(0, 0, 0, 0.07);
+            border-radius: 16px;
+            padding: 1.45rem 1.55rem;
+            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
+            transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
             height: 100%;
             margin-bottom: 1rem;
+            animation: revealUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
         .apple-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 14px 30px rgba(0, 0, 0, 0.06);
-            border-color: #0071E3;
+            transform: translateY(-3px);
+            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.05);
+            border-color: rgba(0, 113, 227, 0.35);
         }
 
         .apple-card-tag {
             display: inline-block;
-            font-size: 0.75rem;
+            font-size: 0.7rem;
             font-weight: 600;
-            color: #0071E3;
-            background: rgba(0, 113, 227, 0.08);
-            padding: 0.22rem 0.68rem;
-            border-radius: 980px;
-            margin-bottom: 0.65rem;
+            letter-spacing: 0.05em;
+            text-transform: uppercase;
+            color: #6E6E73;
+            margin-bottom: 0.45rem;
         }
 
         .apple-card h3 {
-            font-size: 1.22rem;
+            font-size: 1.12rem;
             font-weight: 600;
             letter-spacing: -0.015em;
             color: #1D1D1F;
@@ -386,34 +411,36 @@ def inject_apple_css() -> None:
         }
 
         .apple-card p {
-            font-size: 0.94rem;
+            font-size: 0.9rem;
             line-height: 1.55;
             color: #6E6E73;
             margin: 0;
         }
 
-        /* Section Headlines */
         .apple-section-title {
-            font-size: 1.85rem;
-            font-weight: 700;
-            letter-spacing: -0.025em;
+            font-size: 1.45rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
             color: #1D1D1F;
-            margin-top: 0.5rem;
-            margin-bottom: 0.3rem;
+            margin-top: 0.75rem;
+            margin-bottom: 0.2rem;
         }
 
         .apple-section-lead {
-            font-size: 1.02rem;
+            font-size: 0.94rem;
             color: #6E6E73;
-            margin-bottom: 1.4rem;
+            margin-bottom: 1.2rem;
         }
 
-        /* Pill Buttons & Segmented Controls */
+        /* Pill Buttons & Page Links */
         .stButton > button, .stDownloadButton > button {
             border-radius: 980px !important;
             font-weight: 500 !important;
-            padding: 0.5rem 1.25rem !important;
-            border: 1px solid #D2D2D7 !important;
+            font-size: 0.88rem !important;
+            padding: 0.45rem 1.15rem !important;
+            border: 1px solid rgba(0, 0, 0, 0.12) !important;
+            background: #FFFFFF !important;
+            color: #1D1D1F !important;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
         }
 
@@ -424,76 +451,64 @@ def inject_apple_css() -> None:
         }
 
         .stButton > button:hover, .stDownloadButton > button:hover {
-            transform: scale(1.015);
-            box-shadow: 0 6px 16px rgba(0, 113, 227, 0.16);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        div[data-testid="stPageLink-NavLink"] {
+            border: 1px solid rgba(0, 0, 0, 0.08);
+            border-radius: 12px;
+            background: #FFFFFF;
+            padding: 0.35rem 0.75rem;
+            transition: all 0.2s ease;
+        }
+
+        div[data-testid="stPageLink-NavLink"]:hover {
+            border-color: #0071E3;
+            background: rgba(0, 113, 227, 0.03);
         }
 
         /* Metric Cards */
         div[data-testid="stMetric"] {
             background-color: #FFFFFF;
-            border: 1px solid #D2D2D7;
-            border-radius: 16px;
-            padding: 1rem 1.2rem;
-            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.02);
+            border: 1px solid rgba(0, 0, 0, 0.07);
+            border-radius: 14px;
+            padding: 0.9rem 1.1rem;
+            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.02);
+            animation: revealUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
         }
 
-        /* Status Badges */
         .apple-badge-pass {
             display: inline-block;
             background-color: #E8F8EE;
             color: #116329;
-            border: 1px solid #82E0A3;
-            padding: 0.28rem 0.85rem;
+            padding: 0.22rem 0.75rem;
             border-radius: 980px;
             font-weight: 600;
-            font-size: 0.84rem;
+            font-size: 0.8rem;
         }
 
         .apple-badge-fail {
             display: inline-block;
             background-color: #FFEBEA;
             color: #C92A2A;
-            border: 1px solid #FFA8A8;
-            padding: 0.28rem 0.85rem;
+            padding: 0.22rem 0.75rem;
             border-radius: 980px;
             font-weight: 600;
-            font-size: 0.84rem;
+            font-size: 0.8rem;
         }
 
-        /* Mandatory Apple Footer */
         .apple-footer {
             margin-top: 3.5rem;
-            padding-top: 1.4rem;
-            padding-bottom: 1.2rem;
-            border-top: 1px solid #D2D2D7;
+            padding-top: 1.25rem;
+            padding-bottom: 1rem;
+            border-top: 1px solid rgba(0, 0, 0, 0.08);
             text-align: center;
             color: #6E6E73;
-            font-size: 0.85rem;
+            font-size: 0.82rem;
             font-weight: 400;
-            letter-spacing: -0.005em;
         }
 
-        @media (max-width: 768px) {
-            .apple-hero-title { font-size: 2rem; }
-            .apple-hero { padding: 2rem 1.2rem; }
-        }
-        
-        html {
-            scroll-behavior: smooth;
-        }
-        @keyframes fadeInUp {
-            from {
-                opacity: 0;
-                transform: translateY(20px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        .apple-card, .apple-hero, div[data-testid="stMetric"], div[data-testid="stDataFrame"] {
-            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
         ::-webkit-scrollbar {
             width: 8px;
             height: 8px;
@@ -505,28 +520,24 @@ def inject_apple_css() -> None:
             background: #D2D2D7;
             border-radius: 980px;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #6E6E73;
-        }
-
-</style>
+        </style>
         """,
         unsafe_allow_html=True,
     )
 
 
 def render_top_nav(active_page: str) -> None:
-    """Render sticky translucent Apple-style top navigation bar and sidebar tracker."""
+    """Render clean sticky top header and streamlined sidebar."""
     init_session_state()
     st.session_state["visited_pages"].add(active_page)
 
     pages = [
-        ("Home", "Home"),
-        ("Molecule Viewer", "Viewer"),
-        ("Property Calculator", "Properties"),
+        ("Home", "Overview"),
+        ("Molecule Viewer", "2D / 3D Viewer"),
+        ("Property Calculator", "Descriptors"),
         ("Similarity Search", "Similarity"),
-        ("Dataset Explorer", "Dataset"),
-        ("About", "Theory & Quiz"),
+        ("Dataset Explorer", "Dataset SAR"),
+        ("About", "Theory & Report"),
     ]
     pills_html = "".join(
         f'<span class="apple-nav-pill {"active" if key == active_page else ""}">{label}</span>'
@@ -537,8 +548,8 @@ def render_top_nav(active_page: str) -> None:
         f"""
         <div class="apple-top-nav">
             <div class="apple-brand">
-                <span>🧪 Cheminformatics Virtual Lab</span>
-                <span style="color:#6E6E73; font-weight:400; font-size:0.86rem;">| Apple Edition</span>
+                <span class="apple-brand-dot"></span>
+                <span>Cheminformatics Virtual Lab</span>
             </div>
             <div class="apple-nav-pills">
                 {pills_html}
@@ -549,15 +560,15 @@ def render_top_nav(active_page: str) -> None:
     )
 
     with st.sidebar:
-        st.markdown("### 🧪 Virtual Lab Profile")
-        st.caption("SRM IST • Cheminformatics Suite")
+        st.markdown("#### Student Session")
+        st.caption("SRM IST • Division of Chemistry")
         st.session_state["student_name"] = st.text_input(
-            "Student Name",
+            "Full Name",
             value=st.session_state["student_name"],
             placeholder="Varun K",
         )
         st.session_state["reg_number"] = st.text_input(
-            "Registration Number",
+            "Registration No.",
             value=st.session_state["reg_number"],
             placeholder="RA2611026050122",
         )
@@ -571,20 +582,12 @@ def render_top_nav(active_page: str) -> None:
         visited_count = len(st.session_state["visited_pages"])
         total_modules = 6
         ratio = min(1.0, visited_count / total_modules)
-        st.markdown("#### 📈 Lab Progress")
-        st.progress(ratio, text=f"{visited_count} / {total_modules} Modules Explored ({ratio:.0%})")
-        with st.expander("Completed Modules", expanded=False):
-            for key, _ in pages:
-                mark = "✅" if key in st.session_state["visited_pages"] else "⬜"
-                st.write(f"{mark} {key}")
-
-        with st.expander("🎯 Learning Objectives", expanded=False):
-            for obj in LEARNING_OBJECTIVES:
-                st.markdown(f"- {obj}")
+        st.caption(f"Module Completion • {visited_count} of {total_modules}")
+        st.progress(ratio)
 
 
 def render_footer() -> None:
-    """Render the mandatory centered Apple-style footer on every page."""
+    """Render centered footer on every page."""
     st.markdown(
         f"""
         <div class="apple-footer">
@@ -594,10 +597,6 @@ def render_footer() -> None:
         unsafe_allow_html=True,
     )
 
-
-# -----------------------------------------------------------------------------
-# RDKit CHEMINFORMATICS FUNCTIONS (CACHED)
-# -----------------------------------------------------------------------------
 
 def validate_smiles(smiles: str) -> Tuple[Optional[Chem.Mol], Optional[str]]:
     """Validate a SMILES string and return (Mol, friendly_error_message)."""

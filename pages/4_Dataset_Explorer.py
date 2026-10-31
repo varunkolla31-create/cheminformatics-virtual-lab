@@ -22,7 +22,7 @@ init_session_state()
 inject_apple_css()
 render_top_nav("Dataset Explorer")
 
-st.markdown('<div class="apple-section-title">📈 Chemical Dataset Explorer & SAR Analytics</div>', unsafe_allow_html=True)
+st.markdown('<div class="apple-section-title">Chemical Dataset Explorer & SAR Analytics</div>', unsafe_allow_html=True)
 st.markdown(
     '<div class="apple-section-lead">Upload a CSV or SDF dataset—or explore the built-in 24-compound pharmaceutical library—with interactive filtering and Plotly visualisations.</div>',
     unsafe_allow_html=True,
@@ -144,7 +144,7 @@ st.markdown(f"#### Filtered Dataset Table ({len(df_filtered)} of {len(df)} compo
 st.dataframe(df_filtered, use_container_width=True, hide_index=True)
 
 st.download_button(
-    "📥 Download Filtered Dataset (CSV)",
+    "Export Filtered Dataset (CSV)",
     data=df_filtered.to_csv(index=False).encode("utf-8"),
     file_name="filtered_cheminformatics_dataset.csv",
     mime="text/csv",

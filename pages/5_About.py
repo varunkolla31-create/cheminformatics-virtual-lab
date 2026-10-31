@@ -21,16 +21,16 @@ init_session_state()
 inject_apple_css()
 render_top_nav("About")
 
-st.markdown('<div class="apple-section-title">📘 Cheminformatics Theory, Assessment & Lab Portfolio</div>', unsafe_allow_html=True)
+st.markdown('<div class="apple-section-title">Cheminformatics Theory, Assessment & Portfolio</div>', unsafe_allow_html=True)
 st.markdown(
     '<div class="apple-section-lead">Review foundational concepts, complete the 10-question self-assessment quiz, and download your stamped PDF lab portfolio.</div>',
     unsafe_allow_html=True,
 )
 
 tab_theory, tab_quiz, tab_portfolio = st.tabs([
-    "📖 Core Theory Modules",
-    "✅ Self-Assessment Quiz (10 Questions)",
-    "🎓 Final Lab Portfolio & Credits",
+    "Core Theory",
+    "Self-Assessment Quiz",
+    "Final Lab Portfolio",
 ])
 
 with tab_theory:
@@ -80,7 +80,7 @@ with tab_quiz:
             score += 1
         st.write("")
 
-    if st.button("✔️ Grade Quiz & View Explanations", type="primary"):
+    if st.button("Submit & Grade Assessment", type="primary"):
         st.success(f"🏆 **Your Quiz Score: {score} / {len(QUIZ_QUESTIONS)} ({score / len(QUIZ_QUESTIONS) * 100:.0f}%)**")
         for idx, q in enumerate(QUIZ_QUESTIONS):
             user_ans = st.session_state["quiz_answers"].get(idx)
@@ -111,7 +111,7 @@ with tab_portfolio:
         assessment_score=(score, len(QUIZ_QUESTIONS)),
     )
     st.download_button(
-        "📥 Download Official Lab Portfolio (PDF)",
+        "Download Lab Portfolio (PDF)",
         data=pdf_bytes,
         file_name=f"Cheminformatics_Portfolio_{st.session_state['reg_number']}.pdf",
         mime="application/pdf",
