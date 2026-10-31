@@ -477,7 +477,39 @@ def inject_apple_css() -> None:
             .apple-hero-title { font-size: 2rem; }
             .apple-hero { padding: 2rem 1.2rem; }
         }
-        </style>
+        
+        html {
+            scroll-behavior: smooth;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .apple-card, .apple-hero, div[data-testid="stMetric"], div[data-testid="stDataFrame"] {
+            animation: fadeInUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
+        }
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #FBFBFD;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #D2D2D7;
+            border-radius: 980px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6E6E73;
+        }
+
+</style>
         """,
         unsafe_allow_html=True,
     )
