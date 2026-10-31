@@ -820,46 +820,115 @@ def generate_pdf_report(
     properties_list: List[Dict[str, Any]],
     assessment_score: Optional[Tuple[int, int]] = None,
 ) -> bytes:
-    """Build an Apple-inspired academic PDF report using ReportLab."""
+    """Build an Apple-inspired academic PDF report with SRM IST Division of Chemistry header and Dr. R. Subramanian faculty attribution."""
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
         buffer,
         pagesize=letter,
         rightMargin=40,
         leftMargin=40,
-        topMargin=40,
-        bottomMargin=40,
+        topMargin=36,
+        bottomMargin=36,
     )
     styles = getSampleStyleSheet()
+
+    inst_style = ParagraphStyle(
+        "SRMInstHeader",
+        parent=styles["Normal"],
+        fontName="Helvetica-Bold",
+        fontSize=12,
+        leading=15,
+        alignment=1,  # Center
+        textColor=colors.HexColor("#1D1D1F"),
+        spaceAfter=2,
+    )
+    dept_style = ParagraphStyle(
+        "SRMDeptHeader",
+        parent=styles["Normal"],
+        fontName="Helvetica",
+        fontSize=9.5,
+        leading=13,
+        alignment=1,  # Center
+        textColor=colors.HexColor("#6E6E73"),
+        spaceAfter=10,
+    )
     title_style = ParagraphStyle(
         "AppleTitle",
         parent=styles["Heading1"],
-        fontSize=18,
-        textColor=colors.HexColor("#1D1D1F"),
-        spaceAfter=8,
+        fontName="Helvetica-Bold",
+        fontSize=16,
+        leading=20,
+        alignment=1,  # Center
+        textColor=colors.HexColor("#0071E3"),
+        spaceBefore=4,
+        spaceAfter=12,
     )
     subtitle_style = ParagraphStyle(
         "AppleSub",
         parent=styles["Heading2"],
-        fontSize=13,
-        textColor=colors.HexColor("#0071E3"),
+        fontName="Helvetica-Bold",
+        fontSize=12,
+        leading=16,
+        textColor=colors.HexColor("#1D1D1F"),
         spaceBefore=12,
         spaceAfter=6,
     )
-    normal_style = styles["Normal"]
+    meta_style = ParagraphStyle(
+        "AppleMeta",
+        parent=styles["Normal"],
+        fontName="Helvetica",
+        fontSize=9.5,
+        leading=14,
+        textColor=colors.HexColor("#1D1D1F"),
+        spaceAfter=6,
+    )
+    faculty_style = ParagraphStyle(
+        "FacultyBox",
+        parent=styles["Normal"],
+        fontName="Helvetica",
+        fontSize=9,
+        leading=13,
+        textColor=colors.HexColor("#1D1D1F"),
+        spaceBefore=6,
+        spaceAfter=8,
+    )
+    footer_pdf_style = ParagraphStyle(
+        "FooterPDF",
+        parent=styles["Normal"],
+        fontName="Helvetica",
+        fontSize=8.5,
+        leading=12,
+        alignment=1,
+        textColor=colors.HexColor("#6E6E73"),
+        spaceBefore=14,
+    )
 
     story: List[Any] = []
+
+    # 1. SRM IST Institutional Header
+    story.append(Paragraph("SRM INSTITUTE OF SCIENCE AND TECHNOLOGY, TIRUCHIRAPPALLI", inst_style))
+    story.append(
+        Paragraph(
+            "Faculty of Engineering and Technology &nbsp;|&nbsp; School of Sciences &nbsp;|&nbsp; Division of Chemistry",
+            dept_style,
+        )
+    )
     story.append(Paragraph(f"Cheminformatics Virtual Laboratory — {title}", title_style))
+
+    # 2. Student & Session Metadata Table
+    section_val = st.session_state.get("section", "AIML B") if hasattr(st, "session_state") else "AIML B"
     story.append(
         Paragraph(
             f"<b>Student Name:</b> {student_name or 'Varun K'} &nbsp;&nbsp;|&nbsp;&nbsp; "
             f"<b>Registration No:</b> {reg_number or 'RA2611026050122'} &nbsp;&nbsp;|&nbsp;&nbsp; "
+            f"<b>Section:</b> {section_val} &nbsp;&nbsp;|&nbsp;&nbsp; "
             f"<b>Date:</b> {datetime.now().strftime('%Y-%m-%d %H:%M')}",
-            normal_style,
+            meta_style,
         )
     )
-    story.append(Spacer(1, 14))
+    story.append(Spacer(1, 10))
 
+    # 3. Molecular Descriptors & Lipinski Summary Table
     if properties_list:
         story.append(Paragraph("Molecular Descriptors & Lipinski Rule-of-Five Summary", subtitle_style))
         headers = ["Name / SMILES", "Formula", "MW", "LogP", "TPSA", "HBD", "HBA", "RotB", "Rings", "Lipinski"]
@@ -899,8 +968,9 @@ def generate_pdf_report(
             )
         )
         story.append(t)
-        story.append(Spacer(1, 14))
+        story.append(Spacer(1, 12))
 
+    # 4. Assessment Score Section (if applicable)
     if assessment_score is not None:
         score, total = assessment_score
         pct = (score / total * 100) if total else 0.0
@@ -910,11 +980,23 @@ def generate_pdf_report(
             Paragraph(
                 f"<b>Quiz Score:</b> {score} / {total} ({pct:.0f}%) &nbsp;&nbsp;|&nbsp;&nbsp; "
                 f"<b>Achievement Status:</b> {status}",
-                normal_style,
+                meta_style,
             )
         )
-        story.append(Spacer(1, 12))
+        story.append(Spacer(1, 10))
 
-    story.append(Paragraph(FOOTER_TEXT, normal_style))
+    # 5. Faculty Attribution Block (Dr. R. Subramanian)
+    story.append(Paragraph("Faculty Attribution & Course Coordinator", subtitle_style))
+    story.append(
+        Paragraph(
+            "<b>Dr. R. Subramanian</b> — Assistant Professor, Division of Chemistry, School of Sciences, "
+            "Faculty of Engineering and Technology, SRM Institute of Science and Technology, Tiruchirappalli "
+            "(Contact: rsmani84@gmail.com)",
+            faculty_style,
+        )
+    )
+
+    # 6. Mandatory Student Footer
+    story.append(Paragraph(FOOTER_TEXT, footer_pdf_style))
     doc.build(story)
     return buffer.getvalue()
