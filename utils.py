@@ -206,6 +206,7 @@ def init_session_state() -> None:
         "student_name": "Varun K",
         "reg_number": "RA2611026050122",
         "section": "AIML B",
+        "dark_mode": False,
         "visited_pages": {"Home"},
         "studied_molecules": {},
         "viz_smiles": "CC(=O)Oc1ccccc1C(=O)O",
@@ -222,314 +223,466 @@ def init_session_state() -> None:
 
 
 def inject_apple_css() -> None:
-    """Inject clean, modern product UI CSS (Apple / Linear / Stripe aesthetic)."""
+    """Inject premium SaaS / macOS UI CSS with Chrome hiding, macOS focus rings, glassmorphic sidebar, and OLED Dark Mode."""
+    init_session_state()
+    is_dark = bool(st.session_state.get("dark_mode", False))
+
+    if is_dark:
+        bg_color = "#000000"
+        surface_color = "#1C1C1E"
+        sidebar_bg = "rgba(28, 28, 30, 0.85)"
+        nav_bg = "rgba(28, 28, 30, 0.78)"
+        text_primary = "#F5F5F7"
+        text_secondary = "#98989D"
+        accent = "#0A84FF"
+        border_col = "rgba(255, 255, 255, 0.12)"
+        input_bg = "#2C2C2E"
+        pill_track = "rgba(255, 255, 255, 0.08)"
+        pill_active_bg = "#3A3A3C"
+        card_shadow = "0 8px 28px rgba(0, 0, 0, 0.45)"
+    else:
+        bg_color = "#FBFBFD"
+        surface_color = "#FFFFFF"
+        sidebar_bg = "rgba(245, 245, 247, 0.88)"
+        nav_bg = "rgba(251, 251, 253, 0.85)"
+        text_primary = "#1D1D1F"
+        text_secondary = "#6E6E73"
+        accent = "#0071E3"
+        border_col = "rgba(0, 0, 0, 0.08)"
+        input_bg = "#F5F5F7"
+        pill_track = "rgba(0, 0, 0, 0.04)"
+        pill_active_bg = "#FFFFFF"
+        card_shadow = "0 4px 20px rgba(0, 0, 0, 0.03)"
+
     st.markdown(
-        """
+        f"""
         <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
 
-        :root {
-            --bg: #FBFBFD;
-            --surface: #FFFFFF;
-            --text-primary: #1D1D1F;
-            --text-secondary: #6E6E73;
-            --accent: #0071E3;
-            --border: rgba(0, 0, 0, 0.08);
-        }
+        :root {{
+            --bg: {bg_color};
+            --surface: {surface_color};
+            --text-primary: {text_primary};
+            --text-secondary: {text_secondary};
+            --accent: {accent};
+            --border: {border_col};
+        }}
 
-        html {
+        html {{
             scroll-behavior: smooth;
-        }
+        }}
 
-        html, body, [class*="css"] {
+        html, body, [class*="css"] {{
             font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "SF Pro Display", "Inter", sans-serif !important;
-            color: #1D1D1F;
+            color: {text_primary};
             -webkit-font-smoothing: antialiased;
-        }
+        }}
 
-        code, pre {
+        code, pre {{
             font-family: "JetBrains Mono", "SF Mono", monospace !important;
             font-size: 0.84rem !important;
-        }
+        }}
 
-        .stApp {
-            background-color: #FBFBFD;
-            color: #1D1D1F;
-        }
+        /* 1. Hide Streamlit Default Chrome (Deploy button, MainMenu, Footer, Decoration line) */
+        #MainMenu {{ visibility: hidden !important; }}
+        footer {{ visibility: hidden !important; }}
+        .stDeployButton, [data-testid="stToolbar"], [data-testid="stDecoration"], [data-testid="stStatusWidget"] {{
+            display: none !important;
+        }}
+        header[data-testid="stHeader"] {{
+            background: transparent !important;
+            height: 2.2rem !important;
+        }}
 
-        .block-container {
-            padding-top: 1.25rem !important;
+        .stApp {{
+            background-color: {bg_color};
+            color: {text_primary};
+        }}
+
+        .block-container {{
+            padding-top: 0.85rem !important;
             padding-bottom: 3rem !important;
             max-width: 1180px !important;
-        }
+        }}
 
-        @keyframes revealUp {
-            from {
+        /* 5. Glassmorphic Sidebar */
+        section[data-testid="stSidebar"] {{
+            background: {sidebar_bg} !important;
+            backdrop-filter: saturate(180%) blur(20px) !important;
+            -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
+            border-right: 1px solid {border_col} !important;
+        }}
+        section[data-testid="stSidebar"] * {{
+            color: {text_primary};
+        }}
+
+        /* 2. Apple-Style Input Fields, Textareas & Dropdowns with macOS Focus Ring */
+        div[data-baseweb="input"], div[data-baseweb="select"] > div, div[data-baseweb="textarea"] {{
+            border-radius: 12px !important;
+            background-color: {input_bg} !important;
+            border: 1px solid {border_col} !important;
+            transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+        }}
+        div[data-baseweb="input"]:focus-within,
+        div[data-baseweb="select"] > div:focus-within,
+        div[data-baseweb="textarea"]:focus-within {{
+            border-color: {accent} !important;
+            box-shadow: 0 0 0 3.5px rgba(0, 113, 227, 0.22) !important;
+            background-color: {surface_color} !important;
+        }}
+        div[data-baseweb="input"] input, div[data-baseweb="textarea"] textarea {{
+            color: {text_primary} !important;
+            font-size: 0.92rem !important;
+        }}
+
+        @keyframes revealUp {{
+            from {{
                 opacity: 0;
                 transform: translateY(14px);
-            }
-            to {
+            }}
+            to {{
                 opacity: 1;
                 transform: translateY(0);
-            }
-        }
+            }}
+        }}
 
         /* Sticky Glassmorphic Header */
-        .apple-top-nav {
+        .apple-top-nav {{
             position: sticky;
             top: 0;
             z-index: 999;
-            background: rgba(251, 251, 253, 0.85);
+            background: {nav_bg};
             backdrop-filter: saturate(180%) blur(20px);
             -webkit-backdrop-filter: saturate(180%) blur(20px);
-            border-bottom: 1px solid rgba(0, 0, 0, 0.08);
-            padding: 0.75rem 0.25rem;
-            margin-bottom: 1.75rem;
+            border: 1px solid {border_col};
+            border-radius: 14px;
+            padding: 0.65rem 1.15rem;
+            margin-bottom: 1.65rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
             flex-wrap: wrap;
             gap: 0.75rem;
-        }
+            box-shadow: {card_shadow};
+        }}
 
-        .apple-brand {
+        .apple-brand {{
             display: flex;
             align-items: center;
-            gap: 0.65rem;
+            gap: 0.6rem;
             font-weight: 600;
-            font-size: 0.98rem;
+            font-size: 0.96rem;
             letter-spacing: -0.015em;
-            color: #1D1D1F;
-        }
+            color: {text_primary};
+        }}
 
-        .apple-brand-dot {
+        .apple-brand-dot {{
             width: 8px;
             height: 8px;
             border-radius: 50%;
-            background: #0071E3;
+            background: {accent};
             display: inline-block;
-        }
+            box-shadow: 0 0 8px {accent};
+        }}
 
-        .apple-nav-pills {
+        .apple-nav-pills {{
             display: flex;
             align-items: center;
             gap: 0.25rem;
-            background: rgba(0, 0, 0, 0.04);
+            background: {pill_track};
             padding: 0.22rem;
             border-radius: 980px;
-        }
+        }}
 
-        .apple-nav-pill {
+        .apple-nav-pill {{
             font-size: 0.78rem;
             font-weight: 500;
             padding: 0.28rem 0.78rem;
             border-radius: 980px;
-            color: #6E6E73;
+            color: {text_secondary};
             transition: all 0.2s ease;
-        }
+        }}
 
-        .apple-nav-pill.active {
-            background: #FFFFFF;
-            color: #1D1D1F;
+        .apple-nav-pill.active {{
+            background: {pill_active_bg};
+            color: {text_primary};
             font-weight: 600;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.08);
-        }
+            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.12);
+        }}
 
         /* Hero Section */
-        .apple-hero {
-            background: #FFFFFF;
-            border: 1px solid rgba(0, 0, 0, 0.07);
+        .apple-hero {{
+            background: {surface_color};
+            border: 1px solid {border_col};
             border-radius: 20px;
-            padding: 2.75rem 2.5rem;
-            margin-bottom: 1.75rem;
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.03);
+            padding: 2.6rem 2.4rem;
+            margin-bottom: 1.65rem;
+            box-shadow: {card_shadow};
             animation: revealUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
+        }}
 
-        .apple-eyebrow {
+        .apple-eyebrow {{
             font-size: 0.76rem;
             font-weight: 600;
             text-transform: uppercase;
             letter-spacing: 0.06em;
-            color: #0071E3;
+            color: {accent};
             margin-bottom: 0.45rem;
-        }
+        }}
 
-        .apple-hero-title {
-            font-size: 2.45rem;
+        .apple-hero-title {{
+            font-size: 2.4rem;
             font-weight: 700;
             letter-spacing: -0.03em;
             line-height: 1.12;
-            color: #1D1D1F;
+            color: {text_primary};
             margin: 0 0 0.65rem 0;
-        }
+        }}
 
-        .apple-hero-subtitle {
-            font-size: 1.05rem;
+        .apple-hero-subtitle {{
+            font-size: 1.02rem;
             font-weight: 400;
             line-height: 1.55;
-            color: #6E6E73;
+            color: {text_secondary};
             max-width: 680px;
             margin: 0;
-        }
+        }}
 
         /* Surface Cards */
-        .apple-card {
-            background-color: #FFFFFF;
-            border: 1px solid rgba(0, 0, 0, 0.07);
+        .apple-card {{
+            background-color: {surface_color};
+            border: 1px solid {border_col};
             border-radius: 16px;
             padding: 1.45rem 1.55rem;
-            box-shadow: 0 2px 12px rgba(0, 0, 0, 0.02);
+            box-shadow: {card_shadow};
             transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1), box-shadow 0.25s cubic-bezier(0.16, 1, 0.3, 1), border-color 0.2s ease;
             height: 100%;
             margin-bottom: 1rem;
             animation: revealUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
+        }}
 
-        .apple-card:hover {
+        .apple-card:hover {{
             transform: translateY(-3px);
-            box-shadow: 0 12px 26px rgba(0, 0, 0, 0.05);
-            border-color: rgba(0, 113, 227, 0.35);
-        }
+            border-color: {accent};
+        }}
 
-        .apple-card-tag {
+        .apple-card-tag {{
             display: inline-block;
             font-size: 0.7rem;
             font-weight: 600;
             letter-spacing: 0.05em;
             text-transform: uppercase;
-            color: #6E6E73;
+            color: {text_secondary};
             margin-bottom: 0.45rem;
-        }
+        }}
 
-        .apple-card h3 {
-            font-size: 1.12rem;
+        .apple-card h3 {{
+            font-size: 1.1rem;
             font-weight: 600;
             letter-spacing: -0.015em;
-            color: #1D1D1F;
+            color: {text_primary};
             margin: 0 0 0.45rem 0;
-        }
+        }}
 
-        .apple-card p {
-            font-size: 0.9rem;
+        .apple-card p {{
+            font-size: 0.89rem;
             line-height: 1.55;
-            color: #6E6E73;
+            color: {text_secondary};
             margin: 0;
-        }
+        }}
 
-        .apple-section-title {
-            font-size: 1.45rem;
+        .apple-section-title {{
+            font-size: 1.4rem;
             font-weight: 600;
             letter-spacing: -0.02em;
-            color: #1D1D1F;
+            color: {text_primary};
             margin-top: 0.75rem;
             margin-bottom: 0.2rem;
-        }
+        }}
 
-        .apple-section-lead {
-            font-size: 0.94rem;
-            color: #6E6E73;
+        .apple-section-lead {{
+            font-size: 0.92rem;
+            color: {text_secondary};
             margin-bottom: 1.2rem;
-        }
+        }}
 
         /* Pill Buttons & Page Links */
-        .stButton > button, .stDownloadButton > button {
+        .stButton > button, .stDownloadButton > button {{
             border-radius: 980px !important;
             font-weight: 500 !important;
-            font-size: 0.88rem !important;
+            font-size: 0.86rem !important;
             padding: 0.45rem 1.15rem !important;
-            border: 1px solid rgba(0, 0, 0, 0.12) !important;
-            background: #FFFFFF !important;
-            color: #1D1D1F !important;
+            border: 1px solid {border_col} !important;
+            background: {surface_color} !important;
+            color: {text_primary} !important;
             transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-        }
+        }}
 
-        .stButton > button[kind="primary"], .stDownloadButton > button[kind="primary"] {
-            background-color: #0071E3 !important;
+        .stButton > button[kind="primary"], .stDownloadButton > button[kind="primary"] {{
+            background-color: {accent} !important;
             color: #FFFFFF !important;
-            border-color: #0071E3 !important;
-        }
+            border-color: {accent} !important;
+        }}
 
-        .stButton > button:hover, .stDownloadButton > button:hover {
+        .stButton > button:hover, .stDownloadButton > button:hover {{
             transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-        }
+            border-color: {accent} !important;
+        }}
 
-        div[data-testid="stPageLink-NavLink"] {
-            border: 1px solid rgba(0, 0, 0, 0.08);
+        div[data-testid="stPageLink-NavLink"] {{
+            border: 1px solid {border_col};
             border-radius: 12px;
-            background: #FFFFFF;
-            padding: 0.35rem 0.75rem;
+            background: {surface_color};
+            padding: 0.38rem 0.75rem;
             transition: all 0.2s ease;
-        }
+        }}
 
-        div[data-testid="stPageLink-NavLink"]:hover {
-            border-color: #0071E3;
-            background: rgba(0, 113, 227, 0.03);
-        }
+        div[data-testid="stPageLink-NavLink"]:hover {{
+            border-color: {accent};
+        }}
 
         /* Metric Cards */
-        div[data-testid="stMetric"] {
-            background-color: #FFFFFF;
-            border: 1px solid rgba(0, 0, 0, 0.07);
+        div[data-testid="stMetric"] {{
+            background-color: {surface_color};
+            border: 1px solid {border_col};
             border-radius: 14px;
             padding: 0.9rem 1.1rem;
-            box-shadow: 0 1px 6px rgba(0, 0, 0, 0.02);
+            box-shadow: {card_shadow};
             animation: revealUp 0.55s cubic-bezier(0.16, 1, 0.3, 1) both;
-        }
+        }}
 
-        .apple-badge-pass {
+        .apple-badge-pass {{
             display: inline-block;
-            background-color: #E8F8EE;
-            color: #116329;
+            background-color: rgba(48, 209, 88, 0.16);
+            color: {"#30D158" if is_dark else "#116329"};
             padding: 0.22rem 0.75rem;
             border-radius: 980px;
             font-weight: 600;
             font-size: 0.8rem;
-        }
+        }}
 
-        .apple-badge-fail {
+        .apple-badge-fail {{
             display: inline-block;
-            background-color: #FFEBEA;
-            color: #C92A2A;
+            background-color: rgba(255, 69, 58, 0.16);
+            color: {"#FF453A" if is_dark else "#C92A2A"};
             padding: 0.22rem 0.75rem;
             border-radius: 980px;
             font-weight: 600;
             font-size: 0.8rem;
-        }
+        }}
 
-        .apple-footer {
+        .apple-footer {{
             margin-top: 3.5rem;
             padding-top: 1.25rem;
             padding-bottom: 1rem;
-            border-top: 1px solid rgba(0, 0, 0, 0.08);
+            border-top: 1px solid {border_col};
             text-align: center;
-            color: #6E6E73;
+            color: {text_secondary};
             font-size: 0.82rem;
             font-weight: 400;
-        }
+        }}
 
-        ::-webkit-scrollbar {
+        ::-webkit-scrollbar {{
             width: 8px;
             height: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #FBFBFD;
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #D2D2D7;
+        }}
+        ::-webkit-scrollbar-track {{
+            background: {bg_color};
+        }}
+        ::-webkit-scrollbar-thumb {{
+            background: #6E6E73;
             border-radius: 980px;
-        }
+        }}
         </style>
         """,
         unsafe_allow_html=True,
     )
 
 
+def apply_apple_plotly_style(fig: Any, height: Optional[int] = None) -> Any:
+    """Style any Plotly chart with the minimalist Apple Health / Stocks aesthetic."""
+    init_session_state()
+    is_dark = bool(st.session_state.get("dark_mode", False))
+    text_col = "#F5F5F7" if is_dark else "#1D1D1F"
+    muted_col = "#98989D" if is_dark else "#6E6E73"
+    line_col = "rgba(255, 255, 255, 0.1)" if is_dark else "rgba(0, 0, 0, 0.08)"
+
+    layout_kwargs: Dict[str, Any] = dict(
+        font=dict(family="-apple-system, BlinkMacSystemFont, Inter, sans-serif", color=text_col, size=12),
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+        title_font=dict(size=14, color=text_col, family="-apple-system, BlinkMacSystemFont, Inter, sans-serif"),
+        xaxis=dict(
+            showgrid=False,
+            zeroline=False,
+            showline=True,
+            linecolor=line_col,
+            tickfont=dict(color=muted_col, size=11),
+            title_font=dict(color=muted_col, size=12),
+        ),
+        yaxis=dict(
+            showgrid=False,
+            zeroline=False,
+            showline=False,
+            tickfont=dict(color=muted_col, size=11),
+            title_font=dict(color=muted_col, size=12),
+        ),
+        hoverlabel=dict(
+            bgcolor="#1D1D1F",
+            font_size=12,
+            font_family="-apple-system, BlinkMacSystemFont, Inter, sans-serif",
+            font_color="#FFFFFF",
+            bordercolor="rgba(255,255,255,0.12)",
+        ),
+        margin=dict(l=24, r=24, t=44, b=24),
+    )
+    if height is not None:
+        layout_kwargs["height"] = height
+    fig.update_layout(**layout_kwargs)
+    return fig
+
+
 def render_top_nav(active_page: str) -> None:
-    """Render clean sticky top header and streamlined sidebar."""
+    """Render clean sticky top header and streamlined sidebar with OLED Dark Mode toggle."""
     init_session_state()
     st.session_state["visited_pages"].add(active_page)
+
+    with st.sidebar:
+        st.markdown("#### Appearance")
+        dark_choice = st.toggle(
+            "OLED Dark Mode",
+            value=bool(st.session_state.get("dark_mode", False)),
+            help="Switch between Apple Light Mode (#FBFBFD) and iOS OLED Dark Mode (#000000).",
+        )
+        if dark_choice != st.session_state.get("dark_mode", False):
+            st.session_state["dark_mode"] = dark_choice
+            st.rerun()
+
+        st.divider()
+        st.markdown("#### Student Session")
+        st.caption("SRM IST • Division of Chemistry")
+        st.session_state["student_name"] = st.text_input(
+            "Full Name",
+            value=st.session_state["student_name"],
+            placeholder="Varun K",
+        )
+        st.session_state["reg_number"] = st.text_input(
+            "Registration No.",
+            value=st.session_state["reg_number"],
+            placeholder="RA2611026050122",
+        )
+        st.session_state["section"] = st.text_input(
+            "Section",
+            value=st.session_state["section"],
+            placeholder="AIML B",
+        )
+
+        st.divider()
+        visited_count = len(st.session_state["visited_pages"])
+        total_modules = 6
+        ratio = min(1.0, visited_count / total_modules)
+        st.caption(f"Module Completion • {visited_count} of {total_modules}")
+        st.progress(ratio)
 
     pages = [
         ("Home", "Overview"),
@@ -558,32 +711,6 @@ def render_top_nav(active_page: str) -> None:
         """,
         unsafe_allow_html=True,
     )
-
-    with st.sidebar:
-        st.markdown("#### Student Session")
-        st.caption("SRM IST • Division of Chemistry")
-        st.session_state["student_name"] = st.text_input(
-            "Full Name",
-            value=st.session_state["student_name"],
-            placeholder="Varun K",
-        )
-        st.session_state["reg_number"] = st.text_input(
-            "Registration No.",
-            value=st.session_state["reg_number"],
-            placeholder="RA2611026050122",
-        )
-        st.session_state["section"] = st.text_input(
-            "Section",
-            value=st.session_state["section"],
-            placeholder="AIML B",
-        )
-
-        st.divider()
-        visited_count = len(st.session_state["visited_pages"])
-        total_modules = 6
-        ratio = min(1.0, visited_count / total_modules)
-        st.caption(f"Module Completion • {visited_count} of {total_modules}")
-        st.progress(ratio)
 
 
 def render_footer() -> None:

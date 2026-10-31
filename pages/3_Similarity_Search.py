@@ -6,6 +6,7 @@ Created by Varun K | RA2611026050122 | Section: AIML B
 import plotly.express as px
 import streamlit as st
 from utils import (
+    apply_apple_plotly_style,
     EXAMPLE_MOLECULES,
     compute_similarity_search,
     init_session_state,
@@ -75,7 +76,8 @@ with left_chart:
         color_continuous_scale=["#D2D2D7", "#0071E3"],
         title=f"Top Ranked Analogs ({fp_type})",
     )
-    fig.update_layout(yaxis={"categoryorder": "total ascending"}, height=420)
+    fig.update_layout(yaxis={"categoryorder": "total ascending"})
+    apply_apple_plotly_style(fig, height=420)
     st.plotly_chart(fig, use_container_width=True)
 
 with right_table:

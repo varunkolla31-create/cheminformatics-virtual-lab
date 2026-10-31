@@ -8,6 +8,7 @@ import plotly.express as px
 import streamlit as st
 from rdkit import Chem
 from utils import (
+    apply_apple_plotly_style,
     BENCHMARK_LIBRARY,
     calculate_molecular_properties,
     init_session_state,
@@ -123,6 +124,7 @@ with c_scatter:
     )
     fig_sc.add_hline(y=5.0, line_dash="dash", line_color="#E03131", annotation_text="Max LogP (5.0)")
     fig_sc.add_vline(x=500.0, line_dash="dash", line_color="#E03131", annotation_text="Max MW (500 Da)")
+    apply_apple_plotly_style(fig_sc, height=400)
     st.plotly_chart(fig_sc, use_container_width=True)
 
 with c_bar:
@@ -138,6 +140,7 @@ with c_bar:
         color_discrete_map={"Pass": "#0071E3", "Fail": "#E03131"},
         title=f"{metric_choice} Across Filtered Dataset",
     )
+    apply_apple_plotly_style(fig_bar, height=400)
     st.plotly_chart(fig_bar, use_container_width=True)
 
 st.markdown(f"#### Filtered Dataset Table ({len(df_filtered)} of {len(df)} compounds)")
