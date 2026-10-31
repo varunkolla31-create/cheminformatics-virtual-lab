@@ -27,9 +27,6 @@ init_session_state()
 inject_apple_css()
 render_top_nav("Home")
 
-# -----------------------------------------------------------------------------
-# 1. INSTITUTIONAL APPLE-STYLE HERO BANNER (Modelled on Reference App 2)
-# -----------------------------------------------------------------------------
 st.markdown(
     """
     <div class="apple-hero">
@@ -49,7 +46,6 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# Quick-action pill navigation bar across all modules
 c1, c2, c3, c4, c5 = st.columns(5)
 with c1:
     st.page_link("pages/1_Molecule_Viewer.py", label="🧬 Molecular Visualization", use_container_width=True)
@@ -64,9 +60,6 @@ with c5:
 
 st.write("")
 
-# -----------------------------------------------------------------------------
-# 2. WELCOME & WHAT CAN STUDENTS DO? (Checklist + Apple Feature Cards)
-# -----------------------------------------------------------------------------
 col_welcome, col_checklist = st.columns([1.15, 1.0])
 
 with col_welcome:
@@ -118,9 +111,6 @@ with col_checklist:
 
 st.write("")
 
-# -----------------------------------------------------------------------------
-# 3. LABORATORY MODULES OVERVIEW GRID
-# -----------------------------------------------------------------------------
 st.markdown('<div class="apple-section-title">Virtual Laboratory Modules</div>', unsafe_allow_html=True)
 st.markdown(
     '<div class="apple-section-lead">Navigate through the guided workflow from foundational theory to your final downloadable project report.</div>',
@@ -190,9 +180,6 @@ for col, (tag, title, desc) in zip(row2, cards[3:]):
 
 st.write("")
 
-# -----------------------------------------------------------------------------
-# 4. EXAMPLE MOLECULES GALLERY & BENCHMARK TABLE (From Reference App 2)
-# -----------------------------------------------------------------------------
 st.markdown('<div class="apple-section-title">Example Molecules</div>', unsafe_allow_html=True)
 st.markdown(
     '<div class="apple-section-lead">Explore these benchmark organic and pharmaceutical structures across the Virtual Laboratory.</div>',
@@ -228,9 +215,6 @@ st.dataframe(df_bench, use_container_width=True, hide_index=True)
 
 st.write("")
 
-# -----------------------------------------------------------------------------
-# 5. FACULTY MENTORSHIP & STUDENT ATTRIBUTION SECTION (From Reference App 2)
-# -----------------------------------------------------------------------------
 fac_col, stu_col = st.columns(2)
 
 with fac_col:
@@ -240,7 +224,7 @@ with fac_col:
             <div class="apple-card-tag">FACULTY REFERENCE &amp; GUIDANCE</div>
             <h3>👨‍🏫 Developed by</h3>
             <p style="color:#1D1D1F; font-weight:600; font-size:1.02rem; margin-bottom:0.25rem;">
-                Dr. R. Subramanian
+                Dr. P Pachamuthu
             </p>
             <p style="margin-bottom:0.6rem;">
                 Assistant Professor<br/>
@@ -250,7 +234,7 @@ with fac_col:
             </p>
             <p style="font-size:0.88rem;">
                 📧 <strong>For queries, contact:</strong>
-                <a href="mailto:rsmani84@gmail.com" style="color:#0071E3; text-decoration:none;">rsmani84@gmail.com</a>
+                <a href="mailto:pachamuthup@srmist.edu.in" style="color:#0071E3; text-decoration:none;">pachamuthup@srmist.edu.in</a>
             </p>
         </div>
         """,

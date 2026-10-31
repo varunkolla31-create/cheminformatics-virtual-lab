@@ -820,7 +820,7 @@ def generate_pdf_report(
     properties_list: List[Dict[str, Any]],
     assessment_score: Optional[Tuple[int, int]] = None,
 ) -> bytes:
-    """Build an Apple-inspired academic PDF report with SRM IST Division of Chemistry header and Dr. R. Subramanian faculty attribution."""
+    """Build an Apple-inspired academic PDF report with SRM IST Division of Chemistry header and Dr. P Pachamuthu faculty attribution."""
     buffer = io.BytesIO()
     doc = SimpleDocTemplate(
         buffer,
@@ -985,13 +985,13 @@ def generate_pdf_report(
         )
         story.append(Spacer(1, 10))
 
-    # 5. Faculty Attribution Block (Dr. R. Subramanian)
+    # 5. Faculty Attribution Block (Dr. P Pachamuthu)
     story.append(Paragraph("Faculty Attribution & Course Coordinator", subtitle_style))
     story.append(
         Paragraph(
-            "<b>Dr. R. Subramanian</b> — Assistant Professor, Division of Chemistry, School of Sciences, "
+            "<b>Dr. P Pachamuthu</b> — Assistant Professor, Division of Chemistry, School of Sciences, "
             "Faculty of Engineering and Technology, SRM Institute of Science and Technology, Tiruchirappalli "
-            "(Contact: rsmani84@gmail.com)",
+            "(Contact: pachamuthup@srmist.edu.in)",
             faculty_style,
         )
     )
